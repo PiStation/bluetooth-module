@@ -1,11 +1,10 @@
-import {PiStationServer} from "../../src/server";
+import {PiStationServer} from "../../src/server/app/server";
 import * as PiStation from "../../src/client/PiStation";
-import {AbstractModule} from "../../src/client/PiStation";
 
-
-export class TestModule extends PiStation.Module implements AbstractModule {
+/*
+export class TestModule extends PiStation.Module {
     moduleId:string;
-    static DIM_LIGHT_EVENT = new PiStation.ModuleEvent(this, 'dimLight');
+    static DIM_LIGHT_EVENT = new PiStation.ModuleEvent('dimLight');
 
     constructor(){
         super('TestModule');
@@ -33,4 +32,4 @@ export class TestModule extends PiStation.Module implements AbstractModule {
 
         return dummyFunctionUpdates;
     }
-}
+}*/
