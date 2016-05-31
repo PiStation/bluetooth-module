@@ -1,9 +1,0 @@
-{
-  "pistationVersion": "1",
-  "name": "PiStation dummy module",
-  "description": "Dummy module for PiStation",
-  "author": "Robbert van Markus & Rob Quist",
-  "connectors": {
-    "connector433": "1.0.0"
-  }
-}
