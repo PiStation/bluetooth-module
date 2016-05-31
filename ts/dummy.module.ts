@@ -1,6 +1,6 @@
-import * as PiStation from "../../node_modules/pistation-definitions/PiStation.ts";
+import * as PiStation from "../../../node_modules/pistation-definitions/PiStation.ts";
 import {Observable} from 'rxjs/Rx';
-import {Module} from "../../app/module";
+import {Module} from "../../../app/module";
 
 export class Dummy extends Module {
     static moduleId:string;

@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "outDir": "js/",
+    "declaration": false,
+    "removeComments": true,
+    "noLib": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "pretty": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noImplicitReturns": true,
+    "noImplicitUseStrict": false
+  },
+  "filesGlob": [
+    "./ts/*.ts"
+  ],
+  "files": [
+    "../../node_modules/typescript/lib/lib.es6.d.ts"
+  ],
+  "compileOnSave": false
+}
