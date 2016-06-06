@@ -21,7 +21,6 @@
   "homepage": "https://github.com/PiStation/module-dummy#readme",
   "pistation": {
     "version": "1.0.0",
-    "modules": ["Dummy"],
     "connectors": {
       "connector433": "^1.0.0"
     }
