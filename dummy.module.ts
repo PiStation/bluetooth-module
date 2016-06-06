@@ -8,7 +8,24 @@ export class Dummy extends Module {
     constructor(){
         super('Dummy');
 
-        let dummyFunction = new PiStation.Function('powerControl', [new PiStation.Argument('enabled', 'bool')]);
+        let dummyFunction = new PiStation.Function('powerControl', [
+
+            new PiStation.ArgumentBoolean({
+                key:'power',
+                type: 'checkbox',
+                label:'Power',
+                value:true,
+                required: true,
+                order: 1
+            }),
+            new PiStation.ArgumentTextbox({
+                key:'light',
+                label:'Light',
+                value:'Light 1',
+                required: true,
+                order: 2
+            }),
+        ]);
 
         this.addFunction(dummyFunction); //register on module
     }
@@ -26,8 +43,8 @@ export class Dummy extends Module {
 
 
 
-    powerControl(args : PiStation.Argument[]){
-        console.log(`Called Dummy Function with arguments ${args}`);
+    powerControl(args : PiStation.Argument<any>[]){
+        console.log(`Called Dummy Function with arguments`, args);
 
         const dummyFunctionUpdates = Observable //dummy update stream from connector
             .interval(500)
