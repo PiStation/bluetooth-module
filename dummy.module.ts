@@ -12,18 +12,15 @@ export class Dummy extends Module {
 
             new PiStation.ArgumentBoolean({
                 key:'power',
-                type: 'checkbox',
                 label:'Power',
                 value:true,
                 required: true,
-                order: 1
             }),
             new PiStation.ArgumentTextbox({
                 key:'light',
                 label:'Light',
                 value:'Light 1',
                 required: true,
-                order: 2
             }),
         ]);
 
