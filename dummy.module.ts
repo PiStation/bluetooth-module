@@ -1,13 +1,13 @@
 import * as PiStation from "../../node_modules/pistation-definitions/PiStation.ts";
 import {Observable} from 'rxjs/Rx';
 import {Module} from "../../app/module";
+import {Server} from "../../app/server";
 
 export class Dummy extends Module {
     static moduleId:string;
 
-    constructor(){
+    constructor(app:Server){
         super('Dummy');
-
         let dummyFunction = new PiStation.Function('powerControl', [
 
             new PiStation.ArgumentTextbox({
