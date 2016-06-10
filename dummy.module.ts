@@ -55,7 +55,7 @@ export class Dummy extends Module {
         const dummyFunctionUpdates = Observable //dummy update stream from connector
             .interval(500)
             .timeInterval()
-            .take(3);
+            .take(20);
         return dummyFunctionUpdates;
     }
 
@@ -118,7 +118,7 @@ export class Dummy extends Module {
             .interval(100)
             .takeUntil(Observable.interval(10000))
             .map(()=>createGradient())
-            .map(gradient => `<div style="background: ${gradient.background}; height: 50px; width: 100px; display: block;">test</div>`)
+            .map(gradient => `<div style="background: ${gradient.background}; height: 50px; width: ${args.width}; display: block;">test</div>`)
             .map((html) => {
                 return {'value': html}
             });
