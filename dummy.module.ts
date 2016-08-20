@@ -13,14 +13,14 @@ export class Dummy extends Module {
         const settings = server.createModuleStoreReadStream(this);
 
         settings.subscribe((data: any) => {
-                console.log(`module config read ${data.key} = ${JSON.stringify(data.value, null, 4)}`);
-            });
+            console.log(`module config read ${data.key} = ${JSON.stringify(data.value, null, 4)}`);
+        });
 
         settings.find((data: any) => data.key == 'lights')
             .subscribe((data: StoreReadData) => {
                 this.configuredLights = data.value;
                 console.log('settings found', data.value);
-                this.addFunction(this.createDynamicLightFunction(data.value)); //register on module
+                this.addFunction(this.createDynamicLightFunction(JSON.parse(data.value).configuredLights)); //register on module
             })
 
 
@@ -72,7 +72,7 @@ export class Dummy extends Module {
         this.configuredLights.push(args.name);
 
         this.server.getModuleStore(this)
-            .put('lights',this.configuredLights);
+            .put('lights', JSON.stringify({configuredLights: this.configuredLights}));
 
         this.addFunction(this.createDynamicLightFunction(args.name));
 
