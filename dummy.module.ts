@@ -10,18 +10,18 @@ export class Dummy extends Module {
 
     constructor(private server:Server){
         super('Dummy');
-        const settings = server.createModuleStoreReadStream(this);
+        const storeReadStream = server.createModuleStoreReadStream(this);
 
-        settings.subscribe((data: any) => {
+        storeReadStream.subscribe((data: StoreReadData) => {
             console.log(`module config read ${data.key} = ${JSON.stringify(data.value, null, 4)}`);
         });
 
-        settings.find((data: any) => data.key == 'lights')
+        storeReadStream.find((data: StoreReadData) => data.key == 'lights')
             .subscribe((data: StoreReadData) => {
-                this.configuredLights = data.value;
+                this.configuredLights = JSON.parse(data.value).configuredLights; //parse saved JSON
                 console.log('settings found', data.value);
                 this.addFunction(this.createDynamicLightFunction(JSON.parse(data.value).configuredLights)); //register on module
-            })
+            });
 
 
         let addLight = new PiStation.Function('addLight', [
@@ -35,20 +35,20 @@ export class Dummy extends Module {
         this.addFunction(addLight); //register on module
     }
 
-    private createDynamicLightFunction(lightName : string) {
+    private createDynamicLightFunction(lights : string[]) {
         let dummyFunction = new PiStation.Function('powerControl', [
 
             new PiStation.ArgumentTextbox({
-                value: 'test',
+                value: lights[0],
                 key: 'power',
                 label: 'Power',
                 required: true,
             }),
 
-            new PiStation.ArgumentTextbox({
+            new PiStation.ArgumentMultiple({
                 key: 'light',
                 label: 'Light',
-                value: lightName,
+                options: [{key: 'a', value: 'Jorrit'}],
                 required: true,
             }),
         ]);
@@ -63,18 +63,19 @@ export class Dummy extends Module {
             .interval(500)
             .timeInterval()
             .take(20);
+
         return dummyFunctionUpdates;
     }
 
 
-    addLight(args){
+    addLight(args : {name: string}){
         console.log('add light to the store', args);
         this.configuredLights.push(args.name);
 
         this.server.getModuleStore(this)
             .put('lights', JSON.stringify({configuredLights: this.configuredLights}));
 
-        this.addFunction(this.createDynamicLightFunction(args.name));
+        this.addFunction(this.createDynamicLightFunction([args.name]));
 
     }
 
