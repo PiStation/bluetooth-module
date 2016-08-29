@@ -1,5 +1,5 @@
 {
-  "name": "pistation-module-dummy",
+  "name": "pistation-hue-module",
   "version": "1.0.0",
   "description": "Dummy / template module for PiStation",
   "scripts": {
@@ -23,5 +23,8 @@
     "connectors": {
       "connector433": "^1.0.0"
     }
+  },
+  "dependencies": {
+    "node-hue-api": "^2.2.0"
   }
 }
