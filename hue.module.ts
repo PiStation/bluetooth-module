@@ -35,7 +35,7 @@ export class HueModule extends Module {
                 })
             ]);
             this.addFunction(searchBridgesFunction);
-            console.log('kankerlijer', searchBridgesFunction);
+            console.log('Search Bridges Function:', searchBridgesFunction);
         });
 
 
@@ -53,6 +53,6 @@ export class HueModule extends Module {
 
     private registerBridge(args:any) {
         console.log('searchBridgesArgs', args);
-        return Observable.fromPromise(hueApi.registerUser(args.bridge, 'Sjaak'));
+        return Observable.fromPromise(hueApi.registerUser(args.bridge, 'Random Username'));
     }
 }
