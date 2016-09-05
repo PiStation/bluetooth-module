@@ -106,12 +106,12 @@ export class HueModule extends Module {
     }
 
     private getAvailableBridges() {
-        let ipaddress = this.storeReadStream
-            .filter((storeItem:StoreReadData) => storeItem.key == 'ipaddress')
-            .map((ipaddress) => ipaddress.value);
         let username = this.storeReadStream
             .filter((storeItem:StoreReadData) => storeItem.key == 'username')
             .map((username) => username.value);
+        let ipaddress = this.storeReadStream
+            .filter((storeItem:StoreReadData) => storeItem.key == 'ipaddress')
+            .map((ipaddress) => ipaddress.value);
 
         let bridgeConfig = ipaddress.combineLatest(username, (ipaddress, username) => {
             return <IHueConnection>{ipaddress: ipaddress, username: username}
@@ -125,16 +125,15 @@ export class HueModule extends Module {
         const maxLinkButtonPressTime = 10000;
 
         let maxLinkButtonPressTimer = Observable.timer(maxLinkButtonPressTime);
-        let bridgeRegisterTryouts = Observable.interval(1000);
+
+        let bridgeRegisterTryouts = Observable.interval(1000)
+            .takeUntil(maxLinkButtonPressTimer);
 
         let bridgeRegisteredEvent = bridgeRegisterTryouts
-            .flatMap(() => Observable.fromPromise(this.hueApi.registerUser(args.bridge, 'Random Username')))
+            .flatMap(() => Observable.fromPromise(this.hueApi.registerUser(args.bridge, 'PiStation')))
             .retry()
             .first()
-            .takeUntil(maxLinkButtonPressTimer)
-            .map((username) => {
-                return {'value': username};
-            });
+
 
         bridgeRegisteredEvent.forEach((username) => {
             this.saveBridgeConfig(username, args.bridge);
@@ -144,28 +143,32 @@ export class HueModule extends Module {
             Observable.from([{'value': 'Press link button'}])
                 .merge(
                     maxLinkButtonPressTimer
-                        .timeInterval()
                         .takeUntil(bridgeRegisteredEvent)
                         .map(time => {
                             return {value: `to late... try again :)`}
                         }))
                 .merge(
                     bridgeRegisterTryouts
-                        .takeUntil(maxLinkButtonPressTimer)
                         .timeInterval()
                         .takeUntil(bridgeRegisteredEvent)
                         .map(time => {
-                            return {value: `${((maxLinkButtonPressTime/1000)- time.value)} sec to press the link button`}
-                        })
-                )
-                .merge(bridgeRegisteredEvent)
+                            return {value: `${((maxLinkButtonPressTime/1000)- (time.value +1))} sec to press the link button`}
+                        }))
+                .merge(
+                    bridgeRegisteredEvent
+                        .map((username) => {
+                            return {value: `${username} successful connected`};
+                        }));
+
         return functionOutputStream;
     }
 
     private saveBridgeConfig(username, ipaddress) {
         let moduleStore = this.server.getModuleStore(this);
         this.hueApi = new hue.HueApi(ipaddress, username.value);
-        moduleStore.put('username', username.value);
+        console.log('saving shit user', username);
+        console.log('saving shit ip', ipaddress);
+        moduleStore.put('username', username);
         moduleStore.put('ipaddress', ipaddress);
     }
 
