@@ -132,12 +132,10 @@ export class HueModule extends Module {
         let bridgeRegisteredEvent = bridgeRegisterTryouts
             .flatMap(() => Observable.fromPromise(this.hueApi.registerUser(args.bridge, 'PiStation')))
             .retry()
-            .first()
+            .first();
 
-
-        bridgeRegisteredEvent.forEach((username) => {
-            this.saveBridgeConfig(username, args.bridge);
-        });
+        bridgeRegisteredEvent
+            .forEach((username) => this.saveBridgeConfig(username, args.bridge));
 
         let functionOutputStream =
             Observable.from([{'value': 'Press link button'}])
