@@ -72,7 +72,7 @@ export class HueModule extends Module {
                     key: 'light',
                     label: 'Toggle',
                     options: lights.lights.map((light) => {
-                        return {key: light.id, value: light.state.on}
+                        return {key: light.id, value: light.name}
                     }),
                     required: true,
                 })
