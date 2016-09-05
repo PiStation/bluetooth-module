@@ -53,7 +53,7 @@ export class HueModule extends Module {
             this.addFunction(searchBridgesFunction);
             console.log('Search Bridges Function:', searchBridgesFunction);
         });
-
+        this.hueApi = new hue.HueApi();
         this.getAvailableBridges().subscribe((connection:IHueConnection) => {
                 this.hueApi = new hue.HueApi(connection.ipaddress, connection.username)
                 this.lightState = hue.lightState;
