@@ -120,20 +120,46 @@ export class HueModule extends Module {
     }
 
     private registerBridge(args:any) {
-        console.log('searchBridgesArgs', args.bridge);
-        let functionOutputStream = Observable.from([{'value': 'Press link button'}]);
-        let bridgeRegisterTryout = Observable.interval(1000)
+        console.log('registering', args.bridge);
+
+        const maxLinkButtonPressTime = 10000;
+
+        let maxLinkButtonPressTimer = Observable.timer(maxLinkButtonPressTime);
+        let bridgeRegisterTryouts = Observable.interval(1000);
+
+        let bridgeRegisteredEvent = bridgeRegisterTryouts
             .flatMap(() => Observable.fromPromise(this.hueApi.registerUser(args.bridge, 'Random Username')))
             .retry()
             .first()
-            .takeUntil(Observable.timer(10000))
+            .takeUntil(maxLinkButtonPressTimer)
             .map((username) => {
                 return {'value': username};
             });
-        bridgeRegisterTryout.subscribe((username) => {
+
+        bridgeRegisteredEvent.forEach((username) => {
             this.saveBridgeConfig(username, args.bridge);
         });
-        return functionOutputStream.merge(bridgeRegisterTryout);
+
+        let functionOutputStream =
+            Observable.from([{'value': 'Press link button'}])
+                .merge(
+                    maxLinkButtonPressTimer
+                        .timeInterval()
+                        .takeUntil(bridgeRegisteredEvent)
+                        .map(time => {
+                            return {value: `to late... try again :)`}
+                        }))
+                .merge(
+                    bridgeRegisterTryouts
+                        .takeUntil(maxLinkButtonPressTimer)
+                        .timeInterval()
+                        .takeUntil(bridgeRegisteredEvent)
+                        .map(time => {
+                            return {value: `${((maxLinkButtonPressTime/1000)- time.value)} sec to press the link button`}
+                        })
+                )
+                .merge(bridgeRegisteredEvent)
+        return functionOutputStream;
     }
 
     private saveBridgeConfig(username, ipaddress) {
