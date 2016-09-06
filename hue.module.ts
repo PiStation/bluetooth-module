@@ -21,6 +21,7 @@ interface IHueConnection {
 }
 interface ILight {
     id:string;
+    name: string;
     state: {
         on:boolean;
     };
@@ -37,6 +38,8 @@ export class HueModule extends Module {
     constructor(private server:Server) {
         super('HueModule');
         this.storeReadStream = server.createModuleStoreReadStream(this);
+        this.hueApi = new hue.HueApi();
+
         let foundBridgesStream = this.searchBridges();
         foundBridgesStream.subscribe((bridges:IBridge[]) => {
 
@@ -53,7 +56,7 @@ export class HueModule extends Module {
             this.addFunction(searchBridgesFunction);
             console.log('Search Bridges Function:', searchBridgesFunction);
         });
-        this.hueApi = new hue.HueApi();
+
         this.getAvailableBridges().subscribe((connection:IHueConnection) => {
                 this.hueApi = new hue.HueApi(connection.ipaddress, connection.username)
                 this.lightState = hue.lightState;
@@ -122,7 +125,7 @@ export class HueModule extends Module {
     private registerBridge(args:any) {
         console.log('registering', args.bridge);
 
-        const maxLinkButtonPressTime = 10000;
+        const maxLinkButtonPressTime = 30000;
 
         let maxLinkButtonPressTimer = Observable.timer(maxLinkButtonPressTime);
 
@@ -172,14 +175,19 @@ export class HueModule extends Module {
 
     private toggleLights(lightArgs) {
         console.log('lightId: ', lightArgs.light);
-        let light = this.getLightsStream()
+        let lights = this.getLightsStream()
             .map((lightsArray:any) => <ILight[]>lightsArray.lights)
-            .first();
-        light.subscribe((lights:ILight[]) => {
-            let light = lights.filter((light) => light.id == lightArgs.light)[0];
-            console.log('Staat het licht aan?', light);
-            this.hueApi.setLightState(lightArgs.light,
-                (light.state.on?this.lightState.create().turnOff():this.lightState.create().turnOn()));
-        });
+            .flatMap((lights:ILight[]) => {
+                let light = lights.filter((light) => light.id == lightArgs.light)[0];
+                const toggleBoolean = (light.state.on ? this.lightState.create().turnOff() : this.lightState.create().turnOn());
+
+                return Observable
+                    .fromPromise(this.hueApi.setLightState(lightArgs.light, toggleBoolean))
+                    .map((event) => {
+                        return {value: `${light.name} to ${light.state.on ? 'Off' : 'On'}`}
+                    });
+            });
+
+        return lights
     }
 }
