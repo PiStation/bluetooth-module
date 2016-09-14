@@ -167,8 +167,8 @@ export class HueModule extends Module {
     private saveBridgeConfig(username, ipaddress) {
         let moduleStore = this.server.getModuleStore(this);
         this.hueApi = new hue.HueApi(ipaddress, username.value);
-        console.log('saving shit user', username);
-        console.log('saving shit ip', ipaddress);
+        console.log('saving username', username);
+        console.log('saving bridgeIP', ipaddress);
         moduleStore.put('username', username);
         moduleStore.put('ipaddress', ipaddress);
     }
