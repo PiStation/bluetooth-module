@@ -25,6 +25,6 @@
     }
   },
   "dependencies": {
-    "node-hue-api": "^2.2.0"
+    "noble": "^1.6.0"
   }
 }
